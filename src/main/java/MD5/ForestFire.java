@@ -26,9 +26,16 @@ public class ForestFire {
         return colorMap;
     }
 
+
+
+    private void run(double baseFireChance, double dampness){
+
+    }
+
     public void logic(){
         double fireChance = 0.5;
         double dampness = 0.1;
+
     }
 
 }
