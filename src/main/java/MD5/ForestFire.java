@@ -26,6 +26,9 @@ public class ForestFire {
         return colorMap;
     }
 
+    private double calculateFireChance(double baseFireChance, HashMap<String, Integer> colorMap){
+        return baseFireChance + 0.05 * colorMap.get("fire");
+    }
 
 
     private void run(double baseFireChance, double dampness){
