@@ -12,7 +12,7 @@ public class ForestFire {
     private static final int tree = Color.GREEN.getRGB();
     private static final int burningTree = Color.ORANGE.getRGB();
     private static final int coal = Color.BLACK.getRGB();
-    private static final int mountain = Color.DARK_GRAY.getRGB();
+    //private static final int mountain = Color.DARK_GRAY.getRGB();
     private static BufferedImage board;
     private static BufferedImage nextGen;
 
@@ -46,6 +46,37 @@ public class ForestFire {
         return checker(colors);
     }
 
+    private double calculateFireChance(double baseFireChance, HashMap<String, Integer> colorMap, String windDirection, int x, int y){
+        double fireChance = baseFireChance + 0.05 * colorMap.get("fire");
+        switch (windDirection){
+            case "N":
+                try {
+                    if (board.getRGB(x, y + 1) == burningTree) fireChance *= 1.2;
+                }catch (ArrayIndexOutOfBoundsException e){
+                    break;
+                }
+            case "S":
+                try {
+                    if(board.getRGB(x, y-1) == burningTree) fireChance*=1.2;
+                }catch (ArrayIndexOutOfBoundsException e){
+                    break;
+                }
+            case "E":
+                try{
+                    if (board.getRGB(x+1, y) == burningTree) fireChance*=1.2;
+                } catch (ArrayIndexOutOfBoundsException e){
+                    break;
+                }
+            case "W":
+                try{
+                    if(board.getRGB(x-1, y) == burningTree) fireChance*=1.2;
+                } catch (ArrayIndexOutOfBoundsException e){
+                    break;
+                }
+        }
+        return fireChance;
+    }
+
     private void regrow(HashMap<String, Integer> colorMap, double baseRegrowChance, int x, int y) {
         double regrow = baseRegrowChance * 0.05 * colorMap.get("tree");
         double chance = ThreadLocalRandom.current().nextDouble(0, 1);
@@ -58,12 +89,13 @@ public class ForestFire {
         if(burn < chance) nextGen.setRGB(x, y, burningTree);
     }
 
-    private void run(double baseFireChance, double dampness, double regrowChance) {
+    private void run(double baseFireChance, double dampness, double regrowChance, String windDirection) {
         for (int y = 0; y < board.getHeight() - 1; y++) {
             for (int x = 0; x < board.getWidth() - 1; x++) {
                 HashMap<String, Integer> colorMap = absorbingBoundary(x, y);
                 int pixelColor = board.getRGB(x, y);
-                if(pixelColor == tree) burn(colorMap, baseFireChance-dampness, x, y);
+                double fireChance = calculateFireChance(baseFireChance, colorMap, windDirection, x, y) - dampness;
+                if(pixelColor == tree) burn(colorMap, fireChance, x, y);
                 else if(pixelColor == coal) regrow(colorMap, regrowChance, x, y);
                 else if (pixelColor == burningTree) nextGen.setRGB(x, y, coal);
             }
@@ -73,7 +105,9 @@ public class ForestFire {
     public void logic() {
         double fireChance = 0.5;
         double dampness = 0.1;
-
+        double regrowChance = 0.5;
+        String windDirection = "north";
+        run(fireChance, dampness, regrowChance, windDirection);
     }
 
 }
