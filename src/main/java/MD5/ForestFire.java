@@ -2,6 +2,7 @@ package MD5;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.Vector;
@@ -52,24 +53,28 @@ public class ForestFire {
             case "N":
                 try {
                     if (board.getRGB(x, y + 1) == burningTree) fireChance *= 1.2;
+                    break;
                 }catch (ArrayIndexOutOfBoundsException e){
                     break;
                 }
             case "S":
                 try {
                     if(board.getRGB(x, y-1) == burningTree) fireChance*=1.2;
+                    break;
                 }catch (ArrayIndexOutOfBoundsException e){
                     break;
                 }
             case "E":
                 try{
                     if (board.getRGB(x+1, y) == burningTree) fireChance*=1.2;
+                    break;
                 } catch (ArrayIndexOutOfBoundsException e){
                     break;
                 }
             case "W":
                 try{
                     if(board.getRGB(x-1, y) == burningTree) fireChance*=1.2;
+                    break;
                 } catch (ArrayIndexOutOfBoundsException e){
                     break;
                 }
@@ -84,9 +89,12 @@ public class ForestFire {
     }
 
     private void burn(HashMap<String, Integer> colorMap, double baseFireChance, int x, int y){
-        double burn = baseFireChance + 0.05 * colorMap.get("fire");
-        double chance = ThreadLocalRandom.current().nextDouble(0,1);
-        if(burn < chance) nextGen.setRGB(x, y, burningTree);
+        if(colorMap.get("fire") > 0) {
+            double burn = baseFireChance + 0.05 * colorMap.get("fire");
+            double chance = ThreadLocalRandom.current().nextDouble(0, 1);
+            if (burn < chance) nextGen.setRGB(x, y, burningTree);
+            else nextGen.setRGB(x, y, tree);
+        }
     }
 
     private void run(double baseFireChance, double dampness, double regrowChance, String windDirection) {
@@ -100,13 +108,16 @@ public class ForestFire {
                 else if (pixelColor == burningTree) nextGen.setRGB(x, y, coal);
             }
         }
+        FileHandler.saveImage("1", nextGen);
     }
 
     public void logic() {
+        board = FileHandler.openImage("src/main/resources/SmallForest.bmp");
+        nextGen = FileHandler.openImage("src/main/resources/SmallForest.bmp");
         double fireChance = 0.5;
         double dampness = 0.1;
         double regrowChance = 0.5;
-        String windDirection = "north";
+        String windDirection = "E";
         run(fireChance, dampness, regrowChance, windDirection);
     }
 
