@@ -16,8 +16,8 @@ public interface FileHandler {
 
     static void saveImage(String name, BufferedImage image){
         try {
-            File newImage = new File("src/main/java/images/" + name + ".bmp");
-            ImageIO.write(image, "bmp", newImage);
+            File newImage = new File("src/main/java/images/" + name + ".png");
+            ImageIO.write(image, "png", newImage);
         }catch (IOException e){
             System.out.println("File not created");
         }
