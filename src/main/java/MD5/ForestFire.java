@@ -3,15 +3,17 @@ package MD5;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
-import java.util.Random;
 import java.util.Vector;
 import java.util.concurrent.ThreadLocalRandom;
+import org.apache.commons.io.FileUtils;
+
 
 public class ForestFire {
 
-    private static final int tree = Color.GREEN.getRGB();
-    private static final int burningTree = Color.ORANGE.getRGB();
+    private static final int tree = new Color(120,89,44).getRGB();
+    private static final int burningTree = new Color(26, 81, 100).getRGB();
     private static final int coal = Color.BLACK.getRGB();
     //private static final int mountain = Color.DARK_GRAY.getRGB();
     private static BufferedImage board;
@@ -110,15 +112,21 @@ public class ForestFire {
     }
 
     public void logic() {
-        double fireChance = 0.5;
+        double fireChance = 0.8;
         double dampness = 0.1;
         double regrowChance = 0.0;
         String windDirection = "E";
-        for(int i = 0; i < 20; i++) {
-            board = FileHandler.openImage("src/main/java/images/" + i +".png");
-            nextGen = FileHandler.openImage("src/main/java/images/" + i +".png");
+        try {
+            FileUtils.cleanDirectory(new File("src/main/java/images"));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        board = FileHandler.openImage("src/main/resources/ForestBigTest.png");
+        nextGen = new BufferedImage(board.getWidth(), board.getHeight(), BufferedImage.TYPE_INT_RGB);
+        for(int i = 0; i < 10; i++) {
             run(fireChance, dampness, regrowChance, windDirection);
             FileHandler.saveImage(String.valueOf(i+1), nextGen);
+            board = FileHandler.openImage("src/main/images/" + (i+1) + ".png");
         }
     }
 
